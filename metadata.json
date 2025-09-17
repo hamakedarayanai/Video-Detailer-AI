@@ -1,0 +1,5 @@
+{
+  "name": "Video Detailer AI",
+  "description": "Upload a video, and this application will use AI to extract key frames and generate a detailed text description of its content.",
+  "requestFramePermissions": []
+}
