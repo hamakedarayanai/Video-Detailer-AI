@@ -3,13 +3,14 @@ import React, { useState, useCallback, useRef } from 'react';
 import { Header } from './components/Header';
 import { VideoUploader } from './components/VideoUploader';
 import { Loader } from './components/Loader';
-import { describeVideoFrames } from './services/geminiService';
+import { describeVideoFrames, VideoDescription } from './services/geminiService';
 import { extractFramesFromVideo } from './utils/videoUtils';
+import { DescriptionDisplay } from './components/DescriptionDisplay';
 
 const App: React.FC = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  const [description, setDescription] = useState<string>('');
+  const [description, setDescription] = useState<VideoDescription | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -18,7 +19,7 @@ const App: React.FC = () => {
     setVideoFile(file);
     const url = URL.createObjectURL(file);
     setVideoUrl(url);
-    setDescription('');
+    setDescription(null);
     setError(null);
   };
 
@@ -29,7 +30,7 @@ const App: React.FC = () => {
     }
 
     setIsLoading(true);
-    setDescription('');
+    setDescription(null);
     setError(null);
 
     try {
@@ -38,12 +39,20 @@ const App: React.FC = () => {
         throw new Error("Could not extract any frames from the video. The file might be corrupted or in an unsupported format.");
       }
       
-      const generatedDescription = await describeVideoFrames(frames);
+      const timeoutPromise = new Promise<VideoDescription>((_, reject) =>
+        setTimeout(() => reject(new Error('AI analysis timed out after 30 seconds. Please check your connection or try again later.')), 30000)
+      );
+      
+      const generatedDescription = await Promise.race([
+        describeVideoFrames(frames),
+        timeoutPromise,
+      ]);
+
       setDescription(generatedDescription);
     } catch (err: unknown) {
       console.error(err);
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
-      setError(`Failed to generate description: ${errorMessage}`);
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +64,7 @@ const App: React.FC = () => {
     }
     setVideoFile(null);
     setVideoUrl(null);
-    setDescription('');
+    setDescription(null);
     setError(null);
   };
 
@@ -129,7 +138,7 @@ const App: React.FC = () => {
                 </div>
               )}
               {description && (
-                <p className="text-gray-300 whitespace-pre-wrap leading-relaxed">{description}</p>
+                <DescriptionDisplay description={description} />
               )}
             </div>
           </div>

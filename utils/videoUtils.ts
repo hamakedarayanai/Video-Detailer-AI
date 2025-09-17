@@ -7,14 +7,42 @@
  */
 export const extractFramesFromVideo = (videoFile: File, frameCount: number): Promise<string[]> => {
   return new Promise((resolve, reject) => {
+    if (videoFile.size === 0) {
+      return reject(new Error('The provided video file is empty.'));
+    }
+
     const video = document.createElement('video');
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
     const frames: string[] = [];
     
     if (!context) {
-      return reject(new Error('Could not create canvas context.'));
+      return reject(new Error('Could not create canvas context. This may be due to browser limitations.'));
     }
+
+    // Attach a comprehensive error handler early to catch loading issues.
+    video.onerror = () => {
+      URL.revokeObjectURL(video.src);
+      let message = 'An unknown error occurred while trying to load the video.';
+      // video.error can be null, so we need to check for its existence.
+      if (video.error) {
+        switch (video.error.code) {
+          case 1: // MEDIA_ERR_ABORTED
+            message = 'The video loading was aborted. Please try uploading again.';
+            break;
+          case 2: // MEDIA_ERR_NETWORK
+            message = 'A network error occurred. Please check your connection and try again.';
+            break;
+          case 3: // MEDIA_ERR_DECODE
+            message = 'The video file is corrupted or in a format that cannot be decoded by your browser.';
+            break;
+          case 4: // MEDIA_ERR_SRC_NOT_SUPPORTED
+            message = 'The video format is not supported. Please try a different format like MP4 or WebM.';
+            break;
+        }
+      }
+      reject(new Error(message));
+    };
 
     video.preload = 'metadata';
     video.src = URL.createObjectURL(videoFile);
@@ -27,7 +55,7 @@ export const extractFramesFromVideo = (videoFile: File, frameCount: number): Pro
       const duration = video.duration;
       if (duration === 0 || !isFinite(duration)) {
         URL.revokeObjectURL(video.src);
-        return reject(new Error('Video has no duration or is invalid.'));
+        return reject(new Error('The video file seems to be invalid or corrupted as it has no duration.'));
       }
       
       const interval = duration / (frameCount + 1);
@@ -53,11 +81,6 @@ export const extractFramesFromVideo = (videoFile: File, frameCount: number): Pro
         currentTime += interval;
         captureFrame();
       };
-      
-      video.onerror = (e) => {
-        URL.revokeObjectURL(video.src);
-        reject(new Error('Error loading video file. It may be corrupt or in an unsupported format.'));
-      }
 
       // Start the process
       video.play().then(() => {
@@ -65,7 +88,7 @@ export const extractFramesFromVideo = (videoFile: File, frameCount: number): Pro
           captureFrame();
       }).catch(err => {
           // Fallback for browsers that don't return a promise or have autoplay issues
-          setTimeout(captureFrame, 100);
+          setTimeout(captureFrame, 200);
       });
     };
   });
