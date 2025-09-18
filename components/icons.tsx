@@ -1,6 +1,17 @@
 
 import React from 'react';
 
+export const AppLogoIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" {...props}>
+      <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" stroke="#818cf8" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M15.5 12L10 9v6l5.5-3z" stroke="#818cf8" fill="#818cf8" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M8 8l-1.5 1.5" stroke="#818cf8" strokeOpacity="0.7" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M16 8l1.5 1.5" stroke="#818cf8" strokeOpacity="0.7" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M8 16l-1.5-1.5" stroke="#818cf8" strokeOpacity="0.7" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M16 16l1.5-1.5" stroke="#818cf8" strokeOpacity="0.7" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
+
 export const FilmIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}>
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 4h7a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1zm12 0h3a1 1 0 011 1v14a1 1 0 01-1 1h-3a1 1 0 01-1-1V5a1 1 0 011-1z" />
