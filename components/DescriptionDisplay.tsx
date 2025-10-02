@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { VideoDescription } from '../services/geminiService';
 import { DocumentTextIcon, LocationIcon, TagIcon, ListIcon } from './icons';
@@ -9,7 +8,7 @@ interface DescriptionDisplayProps {
 
 export const DescriptionDisplay: React.FC<DescriptionDisplayProps> = ({ description }) => {
   return (
-    <div className="text-gray-300 space-y-6 leading-relaxed animate-fade-in">
+    <div className="text-gray-300 space-y-8 leading-relaxed animate-fade-in">
         {/* Summary */}
         {description.summary && (
             <div>
@@ -41,7 +40,7 @@ export const DescriptionDisplay: React.FC<DescriptionDisplayProps> = ({ descript
                 </h3>
                 <div className="flex flex-wrap gap-2">
                 {description.keyElements.map((element, index) => (
-                    <span key={index} className="bg-gray-700 text-indigo-300 text-sm font-medium px-3 py-1 rounded-full">
+                    <span key={index} className="bg-gray-700 text-indigo-300 text-sm font-medium px-3 py-1 rounded-full transition-colors hover:bg-gray-600 hover:text-indigo-200">
                     {element}
                     </span>
                 ))}
